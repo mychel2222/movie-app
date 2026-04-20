@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Movie App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: white;
+    }
+
+    h1 {
+      margin-top: 50px;
+    }
+
+    input {
+      padding: 12px;
+      width: 260px;
+      border: none;
+      border-radius: 8px;
+      outline: none;
+    }
+
+    button {
+      padding: 12px 20px;
+      margin-left: 10px;
+      border: none;
+      border-radius: 8px;
+      background: #ff9800;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #e68900;
+    }
+
+    #loading {
+      display: none;
+      margin-top: 20px;
+    }
+
+    #loading::after {
+      content: "";
+      display: block;
+      margin: 10px auto;
+      width: 40px;
+      height: 40px;
+      border: 5px solid #ccc;
+      border-top: 5px solid #ff9800;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    #result {
+      margin-top: 30px;
+      background: white;
+      color: black;
+      padding: 20px;
+      display: inline-block;
+      border-radius: 15px;
+      width: 300px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+
+    img {
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🎬 Movie Search App</h1>
+
+  <input type="text" id="title" placeholder="Masukkan judul film">
+  <button onclick="searchMovie()">Cari</button>
+
+  <div id="loading">
+    <p>Loading...</p>
+  </div>
+
+  <div id="result"></div>
+
+  <script>
+    async function searchMovie() {
+      const title = document.getElementById("title").value;
+
+      if (!title) {
+        alert("Masukkan judul film dulu!");
+        return;
+      }
+
+      document.getElementById("loading").style.display = "block";
+      document.getElementById("result").innerHTML = "";
+
+      try {
+        const res = await fetch(`/api/movie?title=${title}`);
+        const data = await res.json();
+
+        document.getElementById("loading").style.display = "none";
+
+        if (data.Response === "False") {
+          document.getElementById("result").innerHTML = "<p>Film tidak ditemukan 😢</p>";
+          return;
+        }
+
+        document.getElementById("result").innerHTML = `
+          <h2>${data.Title}</h2>
+          <p><b>Tahun:</b> ${data.Year}</p>
+          <img src="${data.Poster}" width="200"/>
+          <p>${data.Plot}</p>
+        `;
+      } catch (error) {
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("result").innerHTML = "<p>Terjadi error 😢</p>";
+      }
+    }
+  </script>
+
+</body>
+</html>
